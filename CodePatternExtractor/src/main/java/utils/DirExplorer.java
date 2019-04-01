@@ -1,0 +1,43 @@
+package utils;
+
+import dataStructure.PatternInstance;
+import extractor.PatternInstanceExtractor;
+
+import java.io.File;
+
+public class DirExplorer {
+    public interface FileFilter {
+        boolean interested(int level, String path, File file);
+    }
+
+    public interface FileHandler {
+        void handle(int level, String path, File file);
+    }
+
+    private FileFilter fileFilter;
+    private FileHandler fileHandler;
+
+    public DirExplorer(FileFilter filter, FileHandler handler) {
+        this.fileFilter = filter;
+        this.fileHandler = handler;
+    }
+
+    public void explore(File root) {
+        explore(0, root.getAbsolutePath(), root);
+    }
+
+    private void explore(int level, String path, File file) {
+        if (file.isDirectory()) {
+            for (File child : file.listFiles()) {
+                explore(level + 1, file.getAbsolutePath(), child);
+            }
+        } else {
+            if (fileFilter.interested(level, path, file)) {
+                //System.out.println(file.getAbsolutePath());
+                fileHandler.handle(level, file.getAbsolutePath(), file);
+            }
+        }
+    }
+
+}
+
